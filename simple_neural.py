@@ -3,6 +3,7 @@
 
 import numpy
 import scipy.special
+import csv
 
 class neuralNet:
 
@@ -87,14 +88,18 @@ class neuralNet:
         data_file.close()
 
         scorecard = []
+        correct_values = []
+        neural_net_values = []
 
         for record in data_list:
             all_values = record.split(',')
             correct_label = int(all_values[0])
+            correct_values.append(correct_label)
             #Scale and shift inputs(?)
             inputs = (numpy.asfarray(all_values[1:]) / 255.0 * 0.99) + 0.01
             outputs = self.query(inputs)
             label = numpy.argmax(outputs)
+            neural_net_values.append(label)
 
             if (label == correct_label):
                 scorecard.append(1)
@@ -106,9 +111,15 @@ class neuralNet:
             pass
 
         scorecard_array = numpy.asarray(scorecard)
-        print("performance = ", scorecard_array.sum() / scorecard_array.size)
 
+        if correct_values.size < 50:
+            print("Correct values:  ", correct_values)
+        if neural_net_values.size <= 50:
+            print("Our net's values:", neural_net_values)
+        if scorecard.size <= 50:
+            print("Scorecard:       ", scorecard)
 
+        print("Performance = ", scorecard_array.sum() / scorecard_array.size)
 
 
 #Simple test without training; currently meaningless
@@ -120,7 +131,8 @@ class neuralNet:
 
 test_net = neuralNet(784, 200, 10, 0.1)
 
-test_net.full_train("mnist-data/mnist_train_100.csv", 5)
+test_net.full_train("mnist-data/mnist_train_full.csv", 5)
+test_net.test("mnist-data/mnist_test_full.csv")
 test_net.test("mnist-data/mnist_test_10.csv")
 
 
